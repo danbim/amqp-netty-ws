@@ -27,6 +27,7 @@ import org.jboss.netty.logging.InternalLogger;
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.util.CharsetUtil;
 
+import static com.google.common.base.Throwables.propagate;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.setContentLength;
@@ -51,8 +52,18 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
 		if (msg instanceof HttpRequest) {
 			handleHttpRequest(ctx, (HttpRequest) msg);
 		} else if (msg instanceof WebSocketFrame) {
-			handleWebSocketFrame(ctx, (WebSocketFrame) msg);
+			handleWebSocketFrame(ctx, e);
 		}
+	}
+
+	@Override
+	public void handleUpstream(final ChannelHandlerContext ctx, final ChannelEvent e) throws Exception {
+
+		if (e instanceof MessageEvent) {
+			messageReceived(ctx, (MessageEvent) e);
+		}
+
+		// swallow all other events to fire them according to the websocket channel state
 	}
 
 	private void handleHttpRequest(ChannelHandlerContext ctx, HttpRequest req) throws Exception {
@@ -88,19 +99,43 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
 		if (this.handshaker == null) {
 			wsFactory.sendUnsupportedWebSocketVersionResponse(ctx.getChannel());
 		} else {
-			this.handshaker.performOpeningHandshake(ctx.getChannel(), req);
+			try {
+				this.handshaker.performOpeningHandshake(ctx.getChannel(), req);
+				ctx.sendUpstream(new UpstreamChannelStateEvent(
+						ctx.getChannel(),
+						ChannelState.CONNECTED,
+						ctx.getChannel().getRemoteAddress()
+				)
+				);
+			} catch (Exception e) {
+				throw propagate(e);
+			}
 		}
 	}
 
-	private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
+	private void handleWebSocketFrame(ChannelHandlerContext ctx, MessageEvent e) {
+
+		WebSocketFrame frame = (WebSocketFrame) e.getMessage();
 
 		// Check for closing frame
 		if (frame instanceof CloseWebSocketFrame) {
+
 			this.handshaker.performClosingHandshake(ctx.getChannel(), (CloseWebSocketFrame) frame);
+			ctx.sendUpstream(new UpstreamChannelStateEvent(ctx.getChannel(), ChannelState.CONNECTED, null));
 			return;
+
 		} else if (frame instanceof PingWebSocketFrame) {
-			ctx.getChannel().write(new PongWebSocketFrame(frame.getBinaryData()));
+
+			ctx.sendDownstream(
+					new DownstreamMessageEvent(
+							ctx.getChannel(),
+							new DefaultChannelFuture(ctx.getChannel(), true),
+							new PongWebSocketFrame(frame.getBinaryData()),
+							ctx.getChannel().getRemoteAddress()
+					)
+			);
 			return;
+
 		} else if (!(frame instanceof TextWebSocketFrame)) {
 			throw new UnsupportedOperationException(String.format("%s frame types not supported", frame.getClass()
 					.getName()
@@ -108,10 +143,7 @@ public class WebSocketServerHandler extends SimpleChannelUpstreamHandler {
 			);
 		}
 
-		// Send the uppercase string back.
-		String request = ((TextWebSocketFrame) frame).getText();
-		logger.debug(String.format("Channel %s received %s", ctx.getChannel().getId(), request));
-		ctx.getChannel().write(new TextWebSocketFrame(request.toUpperCase()));
+		ctx.sendUpstream(e);
 	}
 
 	private void sendHttpResponse(ChannelHandlerContext ctx, HttpRequest req, HttpResponse res) {

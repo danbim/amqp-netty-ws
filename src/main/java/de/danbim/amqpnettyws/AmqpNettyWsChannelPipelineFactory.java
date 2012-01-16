@@ -18,7 +18,7 @@ public class AmqpNettyWsChannelPipelineFactory implements ChannelPipelineFactory
 
 	public ChannelPipeline getPipeline() throws Exception {
 		ChannelPipeline pipeline = Channels.pipeline();
-		//pipeline.addFirst("handler", new AmqpConsumerHandler(eventBus));
+		pipeline.addFirst("handler", new AmqpConsumerHandler(eventBus));
 		pipeline.addFirst("webSocketServerHandler", new WebSocketServerHandler());
 		pipeline.addFirst("encoder", new HttpResponseEncoder());
 		pipeline.addFirst("aggregator", new HttpChunkAggregator(65536));
