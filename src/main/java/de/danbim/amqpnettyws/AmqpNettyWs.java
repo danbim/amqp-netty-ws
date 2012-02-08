@@ -42,7 +42,7 @@ public class AmqpNettyWs extends AbstractService {
 				new NioServerSocketChannelFactory(bossExecutor, workerExecutor)
 		);
 		bootstrap.setPipelineFactory(new AmqpNettyWsChannelPipelineFactory(eventBus));
-		serverChannel = bootstrap.bind(new InetSocketAddress(config.getWebsocketPort()));
+		serverChannel = bootstrap.bind(new InetSocketAddress(config.websocketPort));
 
 		amqpConsumerService = new AmqpConsumerService(eventBus, config);
 

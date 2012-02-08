@@ -29,26 +29,26 @@ public class AmqpConsumerService extends AbstractService {
 	protected void doStart() {
 
 		ConnectionFactory factory = new ConnectionFactory();
-		factory.setHost(config.getBrokerHost());
-		factory.setPort(config.getBrokerPort());
-		factory.setUsername(config.getBrokerUsername());
-		factory.setPassword(config.getBrokerPassword());
-		factory.setVirtualHost(config.getBrokerVirtualHost());
+		factory.setHost(config.brokerHost);
+		factory.setPort(config.brokerPort);
+		factory.setUsername(config.brokerUsername);
+		factory.setPassword(config.brokerPassword);
+		factory.setVirtualHost(config.brokerVirtualHost);
 
 		try {
 
 			brokerConnection = factory.newConnection();
 			brokerChannel = brokerConnection.createChannel();
 			brokerChannel.exchangeDeclare(
-					config.getBrokerExchangeName(),
-					config.getBrokerExchangeType(),
-					config.isBrokerExchangeDurable()
+					config.brokerExchangeName,
+					config.brokerExchangeType,
+					config.brokerExchangeDurable
 			);
 			String queueName = brokerChannel.queueDeclare().getQueue();
 			brokerChannel.queueBind(
 					queueName,
-					config.getBrokerExchangeName(),
-					config.getBrokerRoutingKey()
+					config.brokerExchangeName,
+					config.brokerRoutingKey
 			);
 			brokerChannel.basicConsume(queueName, true, new DefaultConsumer(brokerChannel) {
 				@Override

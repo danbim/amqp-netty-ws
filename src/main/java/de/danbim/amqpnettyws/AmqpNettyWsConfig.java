@@ -1,83 +1,50 @@
 package de.danbim.amqpnettyws;
 
+import de.danbim.amqpnettyws.util.Log4JLevelOptionHandler;
+import org.apache.log4j.Level;
+import org.kohsuke.args4j.Option;
+
 public class AmqpNettyWsConfig {
 
-	private int websocketPort;
+	@Option(name = "--websocketPort", usage = "port to listen on for websocket connections")
+	public int websocketPort = 8080;
 
-	private String brokerHost;
+	@Option(name = "--brokerHost", usage = "broker hostname", required = true)
+	public String brokerHost;
 
-	private int brokerPort;
+	@Option(name = "--brokerPort", usage = "broker port")
+	public int brokerPort = 5672;
 
-	private String brokerVirtualHost;
+	@Option(name = "--brokerVirtualHost", usage = "broker virtual host")
+	public String brokerVirtualHost = "";
 
-	private String brokerUsername;
+	@Option(name = "--brokerUsername", usage = "broker username")
+	public String brokerUsername = null;
 
-	private String brokerPassword;
+	@Option(name = "--brokerPassword", usage = "broker password")
+	public String brokerPassword = null;
 
-	private String brokerExchangeName;
+	@Option(name = "--brokerExchangeName", usage = "broker exchange name", required = true)
+	public String brokerExchangeName;
 
-	private String brokerExchangeType;
+	@Option(name = "--brokerExchangeType", usage = "broker exchange type", required = true)
+	public String brokerExchangeType;
 
-	private boolean brokerExchangeDurable;
+	@Option(name = "--brokerExchangeDurable", usage = "broker exchange durable", required = true)
+	public boolean brokerExchangeDurable;
 
-	private String brokerRoutingKey;
+	@Option(name = "--brokerRoutingKey", usage = "broker routing key")
+	public String brokerRoutingKey;
 
-	public AmqpNettyWsConfig(final int websocketPort, final String brokerHost, final int brokerPort,
-							 final String brokerVirtualHost, final String brokerUsername, final String brokerPassword,
-							 final String brokerExchangeName,
-							 final String brokerExchangeType, final boolean brokerExchangeDurable,
-							 final String brokerRoutingKey) {
+	@Option(name = "--logLevel",
+			usage = "Set logging level (valid values: TRACE, DEBUG, INFO, WARN, ERROR).",
+			handler = Log4JLevelOptionHandler.class)
+	public Level logLevel = null;
 
-		this.websocketPort = websocketPort;
-		this.brokerHost = brokerHost;
-		this.brokerPassword = brokerPassword;
-		this.brokerPort = brokerPort;
-		this.brokerUsername = brokerUsername;
-		this.brokerVirtualHost = brokerVirtualHost;
-		this.brokerExchangeName = brokerExchangeName;
-		this.brokerExchangeName = brokerExchangeName;
-		this.brokerExchangeType = brokerExchangeType;
-		this.brokerExchangeDurable = brokerExchangeDurable;
-		this.brokerRoutingKey = brokerRoutingKey;
-	}
+	@Option(name = "--verbose", usage = "Verbose (DEBUG) logging output (default: INFO).")
+	public boolean verbose = false;
 
-	public boolean isBrokerExchangeDurable() {
-		return brokerExchangeDurable;
-	}
+	@Option(name = "--help", usage = "This help message.")
+	public boolean help = false;
 
-	public String getBrokerExchangeName() {
-		return brokerExchangeName;
-	}
-
-	public String getBrokerExchangeType() {
-		return brokerExchangeType;
-	}
-
-	public String getBrokerHost() {
-		return brokerHost;
-	}
-
-	public String getBrokerPassword() {
-		return brokerPassword;
-	}
-
-	public int getBrokerPort() {
-		return brokerPort;
-	}
-
-	public String getBrokerUsername() {
-		return brokerUsername;
-	}
-
-	public String getBrokerVirtualHost() {
-		return brokerVirtualHost;
-	}
-
-	public int getWebsocketPort() {
-		return websocketPort;
-	}
-
-	public String getBrokerRoutingKey() {
-		return brokerRoutingKey;
-	}
 }
