@@ -83,8 +83,8 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>wisebed-maven-repository-releases</id>
-			<url>http://wisebed.eu/maven/releases/</url>
+			<id>itm-maven-repository-releases</id>
+			<url>http://www.itm.uni-luebeck.de/projects/maven/releases/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
