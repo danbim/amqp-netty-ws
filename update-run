@@ -1,0 +1,8 @@
+#!/bin/bash
+
+git pull origin master
+
+mvn clean package
+mvn dependency:build-classpath -Dmdep.outputFile=classpath.txt
+
+java -Djava.net.preferIPv4Stack=true -Xmx1024m -cp target/classes:`cat classpath.txt` de.danbim.amqpnettyws.AmqpNettyWsCli $@

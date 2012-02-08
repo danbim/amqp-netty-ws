@@ -62,7 +62,7 @@ public class AmqpNettyWs extends AbstractService {
 		try {
 			serverChannel.close().await();
 		} catch (Exception e) {
-			log.error("{}", e);
+			log.warn("{}", e);
 		}
 
 		ExecutorUtil.terminate(bossExecutor, workerExecutor);
@@ -70,7 +70,7 @@ public class AmqpNettyWs extends AbstractService {
 		try {
 			amqpConsumerService.stop().get();
 		} catch (Exception e) {
-			log.error("{}", e);
+			log.warn("{}", e);
 		}
 
 		notifyStopped();

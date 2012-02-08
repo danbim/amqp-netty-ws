@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ ! -d target ] || [ ! -f classpath.txt ]
+then
+	mvn clean package
+	mvn dependency:build-classpath -Dmdep.outputFile=classpath.txt
+fi
+
+java -Djava.net.preferIPv4Stack=true -Xmx1024m -cp target/classes:`cat classpath.txt` de.danbim.amqpnettyws.AmqpNettyWsCli $@

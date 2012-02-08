@@ -61,7 +61,6 @@ public class AmqpConsumerService extends AbstractService {
 			);
 
 		} catch (IOException e) {
-			log.error("{}", e);
 			notifyFailed(e);
 			return;
 		}

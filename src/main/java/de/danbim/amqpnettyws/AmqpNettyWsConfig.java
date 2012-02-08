@@ -30,7 +30,7 @@ public class AmqpNettyWsConfig {
 	@Option(name = "--brokerExchangeType", usage = "broker exchange type", required = true)
 	public String brokerExchangeType;
 
-	@Option(name = "--brokerExchangeDurable", usage = "broker exchange durable", required = true)
+	@Option(name = "--brokerExchangeDurable", usage = "broker exchange durable")
 	public boolean brokerExchangeDurable;
 
 	@Option(name = "--brokerRoutingKey", usage = "broker routing key")
