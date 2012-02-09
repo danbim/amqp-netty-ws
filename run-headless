@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ ! -d target ] || [ ! -f classpath.txt ]
+then
+	mvn clean package
+	mvn dependency:build-classpath -Dmdep.outputFile=classpath.txt
+fi
+
+RWS_CP=target/classes:`cat classpath.txt`
+RWS_HOSTNAME=`hostname -f`
+RWS_PARAMS=`cat params`
+nohup java -Djava.net.preferIPv4Stack=true -Xmx1024m -cp $RWS_CP de.danbim.amqpnettyws.AmqpNettyWsCli $RWS_PARAMS 1> amqpnettyws.out 2> amqpnettyws.err &
+echo $! >> amqpnettyws.pid

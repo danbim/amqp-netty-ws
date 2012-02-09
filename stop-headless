@@ -1,0 +1,5 @@
+#!/bin/bash
+if [ -f amqpnettyws.pid ]; then
+	kill `cat amqpnettyws.pid`
+	rm amqpnettyws.pid
+fi
